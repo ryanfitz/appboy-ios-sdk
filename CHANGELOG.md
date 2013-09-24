@@ -1,4 +1,4 @@
-## 1.7.1 (09/21/2013)
+## 1.7.2 (09/21/2013)
 * Fixes a crashing issue affecting all iPhone 5c and 5s devices. All users of previous versions of v1 of the Appboy SDK are recommended to upgrade to version 2.1.1 or later. However, if continued use of v1 is required, or upgrading to 2.1.1 or later would delay the release of a version of your app with the new Appboy SDK, this version will fix the crashing issue with no other changes required.
 
 ## 1.7 (03/28/2013)
