@@ -1,3 +1,8 @@
+## 2.2.1
+* Adds a startup option to appboyOptions to control the automatic capture of social network data. See the documentation on ABKSocialAccountAcquisitionPolicy in Appboy.h for more information.
+* Changes a table cell's default background color to clear, from the white value that became default in iOS7.
+* Adds support for developer to send up image_url for user avatars, allowing for custom images to be included in user profiles on the dashboard.
+
 ## 2.2
 * Adds support for submitting feedback programmatically through an Appboy.h method without using Appboy feedback form. This allows you to create your own feedback form.
 * Fixes an issue where the the news feed's web view would display "Connection Error" when a user came back into the app after a card had directed him or her to a protocol URL. Now when users come back from a redirected protocol URL, the feed is properly displayed.
