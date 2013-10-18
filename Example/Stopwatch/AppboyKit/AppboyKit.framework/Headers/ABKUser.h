@@ -25,6 +25,7 @@
  *      phone
  *      email_subscribe
  *      foursquare_access_token
+ *      image_url
  *
  * 2. The maximum key length is 255 characters; longer keys are truncated.
  *
@@ -77,6 +78,19 @@
  * The User's foursquare access token (String)
  */
 @property (nonatomic, copy) NSString *foursquareAccessToken;
+
+/*!
+ * The User's avatar image URL. This URL will be processed by the server and used in their user profile on the
+ * dashboard. (String)
+ */
+@property (nonatomic, copy) NSString *avatarImageURL;
+
+/*!
+ * The Twitter account identifier for this user. If set, Appboy will only attempt to obtain Twitter data from the
+ * Accounts framework if the account with the specified identifier is available. See the
+ * ABKSocialAccountAcquisitionPolicy documentation in Appboy.h for more information.
+ */
+@property (nonatomic, copy) NSString *twitterAccountIdentifier;
 
 /*!
  * Values representing the gender recognized by the SDK.

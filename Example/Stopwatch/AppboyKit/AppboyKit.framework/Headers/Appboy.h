@@ -12,12 +12,12 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "ABKUser.h"
 
 #ifndef APPBOY_SDK_VERSION
-#define APPBOY_SDK_VERSION @"2.2"
+#define APPBOY_SDK_VERSION @"2.2.1"
 #endif
 
+@class ABKUser;
 @protocol ABKSlideupControllerDelegate;
 
 @interface Appboy : NSObject
@@ -49,7 +49,8 @@
  * @param inApplication The current app
  * @param withLaunchOptions The options NSDictionary that you get from application:didFinishLaunchingWithOptions
  * @param appboyOptions An optional NSDictionary with startup configuration values for Appboy. This currently supports
- * ABKRequestProcessingPolicyOptionKey and ABKFlushIntervalOptionKey. See below for more information.
+ * ABKRequestProcessingPolicyOptionKey, ABKSocialAccountAcquisitionPolicyOptionKey and ABKFlushIntervalOptionKey. See below
+ * for more information.
  * @discussion Starts up Appboy and tells it that your app is done launching. You should call this
  * method in your App Delegate application:didFinishLaunchingWithOptions method before calling makeKeyAndVisible,
  * accessing [Appboy sharedInstance] or otherwise rendering Appboy view controllers. Your apiKey comes from
@@ -73,6 +74,13 @@
 extern NSString *const ABKRequestProcessingPolicyOptionKey;
 
 /*!
+* If you want to set the social account acquisition policy at app startup time (useful for avoiding automatic
+* social account data requests made by Appboy at startup). You can include one of the ABKSocialAccountAcquisitionPolicy
+* enum values as the value for the ABKSocialAccountAcquisitionPolicyOptionKey in the appboyOptions dictionary.
+*/
+extern NSString *const ABKSocialAccountAcquisitionPolicyOptionKey;
+
+/*!
  * Sets the data flush interval (in seconds). This only has an affect when the request processing mode is set to
  * ABKAutomaticRequestProcessing (which is the default). Values are converted into NSTimeIntervals and must be greater
  * than 1.0.
@@ -86,25 +94,21 @@ extern NSString *const ABKFlushIntervalOptionKey;
 /*!
 * Possible values for the SDK's request processing policies:
 *   ABKAutomaticRequestProcessing (default) - All server communication is handled automatically. This includes flushing
-*                                     analytics data to the server, updating the feed, requesting new slideups and
-*                                     posting feedback. Appboy's communication policy is to perform immediate server
-*                                     requests when user facing data is required (new slideups, feed refreshes, etc.),
-*                                     and to otherwise perform periodic flushes of new analytics data every few seconds.
-*                                     The interval between periodic flushes can be set explicitly using the
-*                                     ABKFlushInterval startup option.
+*        analytics data to the server, updating the feed, requesting new slideups and posting feedback. Appboy's
+*        communication policy is to perform immediate server requests when user facing data is required (new slideups,
+*        feed refreshes, etc.), and to otherwise perform periodic flushes of new analytics data every few seconds.
+*        The interval between periodic flushes can be set explicitly using the ABKFlushInterval startup option.
 *   ABKAutomaticRequestProcessingExceptForDataFlush - The same as ABKAutomaticRequestProcessing, except that updates to
-*                                                     custom attributes and triggering of custom events will not
-*                                                     automatically flush to the server. Instead, you
-*                                                     must call flushDataAndProcessRequestQueue when you want to
-*                                                     synchronize newly updated user data with Appboy.
+*        custom attributes and triggering of custom events will not automatically flush to the server. Instead, you
+*        must call flushDataAndProcessRequestQueue when you want to synchronize newly updated user data with Appboy.
 *   ABKManualRequestProcessing - Appboy will automatically add appropriate network requests (feed updates, user
-*                                attribute flushes, feedback posts, etc.) to its network queue, but doesn't process
-*                                network requests except when feedback requests are made via the FeedbackController.
-*                                You can direct Appboy to perform an immediate data flush as well as process any other
-*                                requests on its queue by calling <pre>[[Appboy sharedInstance] flushDataAndProcessRequestQueue];</pre>
-*                                This mode is only recommended for advanced use cases. If you're merely trying to
-*                                control the background flush behavior, consider using ABKAutomaticRequestProcessing
-*                                with a custom flush interval or ABKAutomaticRequestProcessingExceptForDataFlush.
+*        attribute flushes, feedback posts, etc.) to its network queue, but doesn't process
+*        network requests except when feedback requests are made via the FeedbackController.
+*        You can direct Appboy to perform an immediate data flush as well as process any other
+*        requests on its queue by calling <pre>[[Appboy sharedInstance] flushDataAndProcessRequestQueue];</pre>
+*        This mode is only recommended for advanced use cases. If you're merely trying to
+*        control the background flush behavior, consider using ABKAutomaticRequestProcessing
+*        with a custom flush interval or ABKAutomaticRequestProcessingExceptForDataFlush.
 *
 * Regardless of policy, Appboy will intelligently combine requests on the queue to minimize the total number of
 * requests and their combined payload.
@@ -114,6 +118,34 @@ typedef enum {
   ABKAutomaticRequestProcessingExceptForDataFlush,
   ABKManualRequestProcessing
 } ABKRequestProcessingPolicy;
+
+/*!
+* Possible values for the SDK's social account acquisition policies:
+*   ABKAutomaticSocialAccountAcquisition (default) - At app startup and after you've set a social account identifier
+*       on the user object, Appboy will automatically attempt to fetch Twitter and Facebook social account data
+*       for the user and flush it to the server. In all cases, Appboy's automatic data acquisition will ensure that the
+*       user is not prompted or that the UI of your application is otherwise affected. For this reason, when Appboy
+*       tries to perform the data acquisition, your app must have already been granted the relevant permissions to
+*       obtain social account data. If you've specified the twitterAccountIdentifier, Appboy will only attempt to grab
+*       data for that twitter account. If you haven't specified it, Appboy will grab data for the first Twitter account
+*       returned by the system. An upcoming release will enable identifier targeting for Facebook as well.
+*
+*       Note: If you have not integrated the Facebook SDK into your app, there is no way to grab Facebook data without
+*       prompting the user, so you must call <pre>[[Appboy sharedInstance] promptUserForAccessToSocialNetwork:ABKSocialNetworkFacebook];</pre>
+*       and allow the user to be prompted. If you have integrated the Facebook SDK, you must ensure that the user has
+*       allowed read permissions. If permission is granted, Appboy will collect the user's basic public profile info
+*       "user_about_me" "email" "user_hometown" "user_birthday" and, if permission is granted, "user_likes".
+*   ABKAutomaticSocialAccountAcquisitionWithIdentifierOnly - Appboy will only attempt to obtain social account information when
+*       an identifier is set on the user for the corresponding social network. Note: This currently only works for
+*       Twitter accounts. An upcoming release will enable identifier targeting for Facebook as well.
+*   ABKManualSocialAccountAcquisition - Appboy will NOT try to acquire social account data. You must call
+*       <pre>[[Appboy sharedInstance] promptUserForAccessToSocialNetwork:(ABKSocialNetwork)];</pre>
+*/
+typedef enum {
+  ABKAutomaticSocialAccountAcquisition,
+  ABKAutomaticSocialAccountAcquisitionWithIdentifierOnly,
+  ABKManualSocialAccountAcquisition
+} ABKSocialAccountAcquisitionPolicy;
 
 /*!
 * Values representing the Social Networks recognized by the SDK.

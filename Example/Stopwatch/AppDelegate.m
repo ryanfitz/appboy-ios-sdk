@@ -17,7 +17,8 @@ static NSString *const CrittercismAppId = @"51b67d141386207417000002";
   [Appboy startWithApiKey:AppboyApiKey
             inApplication:application
         withLaunchOptions:launchOptions
-        withAppboyOptions:@{ABKRequestProcessingPolicyOptionKey: [NSNumber numberWithInteger:ABKAutomaticRequestProcessing]}];
+        withAppboyOptions:@{ABKRequestProcessingPolicyOptionKey: [NSNumber numberWithInteger:ABKAutomaticRequestProcessing],
+                            ABKSocialAccountAcquisitionPolicyOptionKey: [NSNumber numberWithInteger:ABKAutomaticSocialAccountAcquisitionWithIdentifierOnly]}];
 
   if ([Appboy sharedInstance].user.email) {
     [Crittercism setUsername:[Appboy sharedInstance].user.email];
