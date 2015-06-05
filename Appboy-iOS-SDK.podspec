@@ -18,19 +18,4 @@ Pod::Spec.new do |s|
   s.preserve_paths = 'AppboyKit/**/*.*'
   s.vendored_libraries = 'AppboyKit/libAppboyKitLibrary.a'
   s.dependency 'SDWebImage', '~>3.7.0'
-  s.default_subspecs = 'AppboyKit'
-
-  s.subspec 'AppboyKit' do |appboyKit|
-    appboyKit.source_files = 'AppboyKit/headers/AppboyKitLibrary/*.h', 'AppboyKit/*.m'
-    appboyKit.resource = 'AppboyKit/Appboy.bundle'
-    appboyKit.preserve_paths = 'AppboyKit/**/*.*'
-    appboyKit.vendored_libraries = 'AppboyKit/libAppboyKitLibrary.a'
-  end
-
-  s.subspec 'AppboyKitWithoutFacebookSupport' do |appboyKitWithoutFacebookSupport|
-    appboyKitWithoutFacebookSupport.source_files = 'AppboyKit/headers/AppboyKitLibrary/*.h', 'AppboyKit/*.m'
-    appboyKitWithoutFacebookSupport.resource = 'AppboyKit/Appboy.bundle'
-    appboyKitWithoutFacebookSupport.preserve_paths = 'AppboyKit/**/*.*'
-    appboyKitWithoutFacebookSupport.vendored_libraries = 'AppboyKit/libAppboyKitLibrary.a'
-  end
 end
